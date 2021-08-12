@@ -3,12 +3,13 @@ import mediapipe as mp
 import time
 import keyboard
 import numpy as np
+# import csv
+import pandas as pd
+
 
 max_num_hands = 1
 gesture = {
-    0:'action1', 1:'action2', 2:'action3', 3:'action4',
-    4:'action5', 5:'action6', 6:'action7', 7:'action8'
-
+    0:'fist', 1:'one', 2:'two', 3:'three', 4:'four', 5:'five'
 }
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -20,7 +21,33 @@ hands = mpHands.Hands(
 )
 mpDraw = mp.solutions.drawing_utils
 
-f = open('data/train.txt', 'a')
+
+# train_data = open('data/completed_trainset.txt', 'r')
+train_data = np.genfromtxt('data/completed_trainset.txt', delimiter=',')
+
+AngleData = train_data[:,:-1]
+LabelData = train_data[:,-1]
+angle = AngleData.astype(np.float32)
+label = LabelData.astype(np.float32)
+
+print(angle.shape) #241 x 15
+print(label.shape) #241 x -
+
+1/0
+
+with open('data/train.txt', 'r') as in_file:
+    lines = in_file.read().splitlines()
+    # print(lines)
+    # print(lines[0].split(','))
+    for i in lines:
+        splited_line = i.split(',')
+        print(splited_line)
+    # stripped = [line.replace(","," ").split() for line in lines]
+    # print(stripped)
+
+
+df = pd.read_csv('data/train.txt', names=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15', 'label'])
+
 
 while True:
     success, img = cap.read()
@@ -50,21 +77,26 @@ while True:
             # print(angle)
 
             if keyboard.is_pressed('a'):
-
+                numList = []
                 for num in angle:
                     num = round(num, 6)
-                    f.write(str(num))
-                    f.write(',')
-                f.write('6') #레이블링
-                f.write('\n')
+                    numList.append(str(num))
+                numList.append('1')
+                new_df = pd.DataFrame(numList)
+                final_df = pd.concat([df, new_df], ignore_index=True)
+                print(final_df)
                 print("The angle data of the gesture has been saved.")
+                # df.to_csv("sample.csv", index=False)
+                # print(df)
+
+            # data = np.array([angle], dtype=np.float32)
+            # data = np.append(data, 11)
+
             mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
-            #Todo : 기존 txt 파일에 지속적인 추가가 되어야 함
-            #file mode : r -> w
+
 
     cv2.imshow("Image", img)
     cv2.waitKey(1)
     if keyboard.is_pressed('b'):
         break
-f.close()
-
+final_df.to_csv('new_train.csv', index=False, header=False)

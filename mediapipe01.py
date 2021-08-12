@@ -2,10 +2,6 @@ import cv2
 import mediapipe
 import time
 
-
-
-
-
 drawingModule = mediapipe.solutions.drawing_utils
 handsModule = mediapipe.solutions.hands
 
