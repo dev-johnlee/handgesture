@@ -42,8 +42,6 @@ class handDetector():
 
         return lmList
 
-
-
 def main():
     pTime = 0
     cTime = 0
@@ -56,7 +54,8 @@ def main():
         img = detector.findHands(img=img)
         lmList = detector.findPosition(img)
         if len(lmList) !=0:
-            print(lmList[4])
+            print(lmList)
+            # print(lmList[4])
 
         cTime = time.time()
         # 프레임 계산
